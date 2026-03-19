@@ -1,5 +1,5 @@
-#!/usr/bin/env sh
-set -eu
+#!/usr/bin/env bash
+set -euo pipefail
 
 STATE_HOME=${XDG_STATE_HOME:-"$HOME/.local/state"}
 STATE_DIR="$STATE_HOME/yazi-harpoon"

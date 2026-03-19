@@ -1,13 +1,49 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() {
+  cat <<'EOF'
+Usage:
+  generate-yazi-cheatsheet.sh [keymap.toml] [output.png]
+  generate-yazi-cheatsheet.sh --watch [keymap.toml] [output.png]
+
+Options:
+  -w, --watch    Auto-regenerate when keymap file changes.
+  -h, --help     Show this help.
+EOF
+}
+
+WATCH_MODE=0
+POSITIONAL=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -w|--watch)
+      WATCH_MODE=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+set -- "${POSITIONAL[@]}"
+
 ROOT_DIR=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 KEYMAP_FILE=${1:-"$ROOT_DIR/keymap.toml"}
 OUTPUT_FILE=${2:-"$ROOT_DIR/yazi-keybind-cheatsheet.png"}
-GENERATED_AT=$(date '+%Y-%m-%d %H:%M')
 
 if [ ! -f "$KEYMAP_FILE" ]; then
   echo "Keymap file not found: $KEYMAP_FILE" >&2
+  exit 1
+fi
+
+if ! command -v tomlq >/dev/null 2>&1; then
+  echo "'tomlq' command (from kislyuk/yq) not found." >&2
   exit 1
 fi
 
@@ -16,17 +52,30 @@ if ! command -v magick >/dev/null 2>&1; then
   exit 1
 fi
 
-TMP_TEXT=$(mktemp)
-trap 'rm -f "$TMP_TEXT"' EXIT
+generate_once() {
+  local generated_at tmp_text tmp_binds
 
-{
-  echo "YAZI KEYBIND CHEATSHEET"
-  echo "Generated: $GENERATED_AT"
-  echo ""
-  echo "Custom Keybinds (from keymap.toml prepend_keymap)"
-  echo ""
+  generated_at=$(date '+%Y-%m-%d %H:%M')
+  tmp_text=$(mktemp)
+  tmp_binds=$(mktemp)
 
-  awk -v key_w=18 -v desc_w=64 '
+  tomlq -r '
+    (.mgr.prepend_keymap // [])[]
+    | [
+        ((.on | if type == "array" then join(" ") else . end) // ""),
+        (.desc // "")
+      ]
+    | @tsv
+  ' "$KEYMAP_FILE" > "$tmp_binds"
+
+  {
+    echo "YAZI KEYBIND CHEATSHEET"
+    echo "Generated: $generated_at"
+    echo ""
+    echo "Custom Keybinds (from keymap.toml prepend_keymap)"
+    echo ""
+
+  awk -F'\t' -v key_w=18 -v desc_w=64 '
     function trim(s) {
       sub(/^[[:space:]]+/, "", s)
       sub(/[[:space:]]+$/, "", s)
@@ -73,30 +122,16 @@ trap 'rm -f "$TMP_TEXT"' EXIT
       print b
     }
 
-    /^[[:space:]]*\{ on = / {
-      line = $0
-
-      on = line
-      sub(/^[[:space:]]*\{ on = /, "", on)
-      sub(/, run = .*/, "", on)
-      gsub(/\[/, "", on)
-      gsub(/\]/, "", on)
-      gsub(/"/, "", on)
-      gsub(/,/, "", on)
-      on = trim(on)
-      gsub(/[[:space:]]+/, " ", on)
-
-      desc = line
-      sub(/.*desc = "/, "", desc)
-      sub(/".*/, "", desc)
-
+    {
+      on = $1
+      desc = $2
       row(on, desc)
     }
 
     END {
       print b
     }
-  ' "$KEYMAP_FILE"
+  ' "$tmp_binds"
 
   echo ""
   echo "Important Default Yazi Keys You Kept"
@@ -132,17 +167,49 @@ trap 'rm -f "$TMP_TEXT"' EXIT
   echo ""
   echo "  - dd/dr are custom lf-style trash workflows from your keymap."
   echo "  - g-bookmarks include both lf favorites and yazi defaults."
-} > "$TMP_TEXT"
+  } > "$tmp_text"
 
-magick \
-  -background "#0B1220" \
-  -fill "#E6EDF3" \
-  -font "DejaVu-Sans-Mono" \
-  -pointsize 24 \
-  -interline-spacing 4 \
-  label:@"$TMP_TEXT" \
-  -bordercolor "#1F2937" \
-  -border 24 \
-  "$OUTPUT_FILE"
+  magick \
+    -background "#0B1220" \
+    -fill "#E6EDF3" \
+    -font "DejaVu-Sans-Mono" \
+    -pointsize 24 \
+    -interline-spacing 4 \
+    label:@"$tmp_text" \
+    -bordercolor "#0B1220" \
+    -border 24 \
+    "$OUTPUT_FILE"
 
-echo "Wrote cheatsheet image: $OUTPUT_FILE"
+  rm -f "$tmp_text" "$tmp_binds"
+  echo "Wrote cheatsheet image: $OUTPUT_FILE"
+}
+
+generate_once
+
+if [[ "$WATCH_MODE" -eq 1 ]]; then
+  echo "Watching for changes: $KEYMAP_FILE"
+
+  if command -v inotifywait >/dev/null 2>&1; then
+    while inotifywait -qq -e close_write,create,move,delete "$KEYMAP_FILE"; do
+      if [[ -f "$KEYMAP_FILE" ]]; then
+        generate_once || true
+      fi
+    done
+  else
+    echo "inotifywait not found; using polling fallback (2s interval)."
+
+    last_hash=$(sha256sum "$KEYMAP_FILE" | awk '{print $1}')
+    while true; do
+      sleep 2
+      if [[ ! -f "$KEYMAP_FILE" ]]; then
+        continue
+      fi
+
+      current_hash=$(sha256sum "$KEYMAP_FILE" | awk '{print $1}')
+      if [[ "$current_hash" != "$last_hash" ]]; then
+        last_hash="$current_hash"
+        generate_once || true
+      fi
+    done
+  fi
+fi
