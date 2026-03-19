@@ -43,4 +43,14 @@ prepend_keymap = [
 	{ on = [ "g", "w" ], run = "cd ~/Workspace", desc = "Go ~/Workspace" },
 	{ on = [ "g", "c" ], run = "cd ~/.config", desc = "Go ~/.config" },
 	{ on = [ "g", "t" ], run = "cd ~/.local/share/Trash/files", desc = "Go trash files" },
+
+	# Harpoon-like quick marks
+	{ on = [ "g", "a" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh add %h", desc = "Harpoon: add hovered path" },
+	{ on = [ "g", "0" ], run = "shell --block -- ~/.config/yazi/scripts/yazi-harpoon.sh menu --emit", desc = "Harpoon: menu" },
+	{ on = [ "g", "1" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh jump 1 --emit", desc = "Harpoon: jump 1" },
+	{ on = [ "g", "2" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh jump 2 --emit", desc = "Harpoon: jump 2" },
+	{ on = [ "g", "3" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh jump 3 --emit", desc = "Harpoon: jump 3" },
+	{ on = [ "g", "4" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh jump 4 --emit", desc = "Harpoon: jump 4" },
+	{ on = [ "g", "]" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh next --emit", desc = "Harpoon: next" },
+	{ on = [ "g", "[" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh prev --emit", desc = "Harpoon: prev" },
 ]
