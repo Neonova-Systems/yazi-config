@@ -21,7 +21,9 @@ prepend_keymap = [
 
 	# External integrations
 	{ on = "W", run = "shell --orphan -- ${TERMINAL:-xterm}", desc = "Open terminal in CWD" },
-    { on = [ "g", "?" ], run = [ "shell -- ~/.config/yazi/scripts/generate-yazi-cheatsheet.sh", "reveal ~/.config/yazi/yazi-keybind-cheatsheet.png" ], desc = "Generate and preview cheatsheet" },
+	{ on = [ "g", "?" ], run = [ "shell -- ~/.config/yazi/scripts/generate-yazi-cheatsheet.sh", "reveal ~/.config/yazi/yazi-keybind-cheatsheet.png" ], desc = "Generate and preview cheatsheet" },
+	{ on = [ "g", "y" ], run = "copy path --hovered", desc = "Copy hovered file path" },
+	{ on = [ "g", "n" ], run = "copy dirname --hovered", desc = "Copy hovered dirname" },
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
@@ -47,6 +49,9 @@ prepend_keymap = [
 
 	# Harpoon-like quick marks
 	{ on = [ "g", "a" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh add %h", desc = "Harpoon: add hovered path" },
+	{ on = [ "g", "l" ], run = "shell --block -- ~/.config/yazi/scripts/yazi-harpoon.sh list", desc = "Harpoon: list marks" },
+	{ on = [ "g", "x" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh remove %h", desc = "Harpoon: remove hovered mark" },
+	{ on = [ "g", "X" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh clear", desc = "Harpoon: clear all marks" },
 	{ on = [ "g", "0" ], run = "shell --block -- ~/.config/yazi/scripts/yazi-harpoon.sh menu --emit", desc = "Harpoon: menu" },
 	{ on = [ "g", "1" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh jump 1 --emit", desc = "Harpoon: jump 1" },
 	{ on = [ "g", "2" ], run = "shell -- ~/.config/yazi/scripts/yazi-harpoon.sh jump 2 --emit", desc = "Harpoon: jump 2" },
