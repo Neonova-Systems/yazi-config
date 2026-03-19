@@ -21,7 +21,7 @@ prepend_keymap = [
 
 	# External integrations
 	{ on = "W", run = "shell --orphan -- ${TERMINAL:-xterm}", desc = "Open terminal in CWD" },
-	{ on = [ "g", "?" ], run = "shell --orphan -- xdg-open ~/.config/yazi/yazi-keybind-cheatsheet.png", desc = "Open Yazi cheatsheet image" },
+    { on = [ "g", "?" ], run = [ "shell -- ~/.config/yazi/scripts/generate-yazi-cheatsheet.sh", "reveal ~/.config/yazi/yazi-keybind-cheatsheet.png" ], desc = "Generate and preview cheatsheet" },
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
