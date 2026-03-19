@@ -26,6 +26,7 @@ prepend_keymap = [
 	{ on = [ "g", "n" ], run = "copy dirname --hovered", desc = "Copy hovered dirname" },
 	{ on = [ "g", "i" ], run = "shell -- ~/.config/yazi/scripts/copy-file-to-clipboard.sh %h", desc = "Copy hovered file content to clipboard" },
 	{ on = [ "g", "I" ], run = "shell --block -- ~/.config/yazi/scripts/copy-images-collage-to-clipboard.sh %s", desc = "Copy selected images as one collage" },
+	{ on = [ "g", "M" ], run = "shell --block -- ~/.config/yazi/scripts/copy-images-collage-to-clipboard.sh --preserve %s", desc = "Copy selected images as preserve-aspect collage" },
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },

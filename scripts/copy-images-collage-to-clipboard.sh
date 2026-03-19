@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+preserve_mode=0
+if [[ ${1:-} == "--preserve" ]]; then
+  preserve_mode=1
+  shift
+fi
+
 if [[ $# -lt 2 ]]; then
   echo "Select at least 2 images first." >&2
   exit 1
@@ -66,10 +72,15 @@ median_height=$(awk -F '\t' '{ print $3 }' "$meta_file" | median)
 
 accepted_file="$tmp_dir/accepted.tsv"
 while IFS=$'\t' read -r path width height ratio area; do
-  keep=$(awk -v r="$ratio" -v rm="$median_ratio" -v a="$area" -v am="$median_area" '
+  keep=$(awk -v r="$ratio" -v rm="$median_ratio" -v a="$area" -v am="$median_area" -v preserve="$preserve_mode" '
     BEGIN {
-      ratio_ok = (r >= rm * 0.55 && r <= rm * 1.80)
-      area_ok = (a >= am * 0.20 && a <= am * 5.00)
+      if (preserve == 1) {
+        ratio_ok = (r >= rm * 0.35 && r <= rm * 2.80)
+        area_ok = (a >= am * 0.12 && a <= am * 8.00)
+      } else {
+        ratio_ok = (r >= rm * 0.55 && r <= rm * 1.80)
+        area_ok = (a >= am * 0.20 && a <= am * 5.00)
+      }
       print (ratio_ok && area_ok) ? 1 : 0
     }
   ')
@@ -91,6 +102,7 @@ fi
 
 target_width=$(awk -v w="$median_width" 'BEGIN { v = int(w + 0.5); if (v < 240) v = 240; if (v > 900) v = 900; print v }')
 target_height=$(awk -v h="$median_height" 'BEGIN { v = int(h + 0.5); if (v < 180) v = 180; if (v > 900) v = 900; print v }')
+preserve_height=$(awk -v h="$median_height" 'BEGIN { v = int(h + 0.5); if (v < 260) v = 260; if (v > 700) v = 700; print v }')
 
 cols=$(awk -v n="$accepted_count" 'BEGIN { c = int(sqrt(n)); if (c * c < n) c++; if (c < 1) c = 1; print c }')
 
@@ -98,13 +110,21 @@ declare -a tiles=()
 index=0
 while IFS=$'\t' read -r path _w _h; do
   tile="$tmp_dir/tile-$index.png"
-  magick -- "$path" \
-    -auto-orient \
-    -resize "${target_width}x${target_height}" \
-    -gravity center \
-    -background '#101418' \
-    -extent "${target_width}x${target_height}" \
-    "$tile"
+  if (( preserve_mode == 1 )); then
+    magick -- "$path" \
+      -auto-orient \
+      -resize "x${preserve_height}" \
+      -background '#101418' \
+      "$tile"
+  else
+    magick -- "$path" \
+      -auto-orient \
+      -resize "${target_width}x${target_height}" \
+      -gravity center \
+      -background '#101418' \
+      -extent "${target_width}x${target_height}" \
+      "$tile"
+  fi
   tiles+=("$tile")
   index=$((index + 1))
 done < "$accepted_file"
