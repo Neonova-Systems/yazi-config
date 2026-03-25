@@ -45,6 +45,12 @@ prepend_keymap = [
 	{ on = [ "b", "P", "3" ], run = "shell --block -- ~/.config/yazi/scripts/prompt-template.sh explain", desc = "Apply explain template" },
 	{ on = [ "b", "P", "4" ], run = "shell --block -- ~/.config/yazi/scripts/prompt-template.sh review", desc = "Apply review template" },
 
+	# PDF operations
+	{ on = [ "b", "z" ], run = "shell --block -- ~/.config/yazi/scripts/compress-pdf.sh %s", desc = "Compress PDFs to half size" },
+	{ on = [ "b", "S", "1" ], run = "shell --block -- ~/.config/yazi/scripts/split-pdf.sh %h 2", desc = "Split PDF in half (2 chunks)" },
+	{ on = [ "b", "S", "2" ], run = "shell --block -- ~/.config/yazi/scripts/split-pdf.sh %h 3", desc = "Split PDF into 3 chunks" },
+	{ on = [ "b", "S", "3" ], run = "shell --block -- ~/.config/yazi/scripts/split-pdf.sh %h 4", desc = "Split PDF into 4 chunks" },
+
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
