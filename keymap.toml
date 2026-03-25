@@ -39,6 +39,12 @@ prepend_keymap = [
 	{ on = [ "b", "C", "2" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack-budget.sh 8 %s", desc = "Pack files (8k token budget)" },
 	{ on = [ "b", "C", "3" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack-budget.sh 16 %s", desc = "Pack files (16k token budget)" },
 
+	# Prompt templates (apply to clipboard content)
+	{ on = [ "b", "P", "1" ], run = "shell --block -- ~/.config/yazi/scripts/prompt-template.sh debug", desc = "Apply debug template" },
+	{ on = [ "b", "P", "2" ], run = "shell --block -- ~/.config/yazi/scripts/prompt-template.sh refactor", desc = "Apply refactor template" },
+	{ on = [ "b", "P", "3" ], run = "shell --block -- ~/.config/yazi/scripts/prompt-template.sh explain", desc = "Apply explain template" },
+	{ on = [ "b", "P", "4" ], run = "shell --block -- ~/.config/yazi/scripts/prompt-template.sh review", desc = "Apply review template" },
+
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
