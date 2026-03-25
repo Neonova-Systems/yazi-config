@@ -35,6 +35,9 @@ prepend_keymap = [
 
 	# LLM workflow (copy for chat)
 	{ on = [ "b", "c" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack.sh %s", desc = "Pack selected files for chat context" },
+	{ on = [ "b", "C", "1" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack-budget.sh 4 %s", desc = "Pack files (4k token budget)" },
+	{ on = [ "b", "C", "2" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack-budget.sh 8 %s", desc = "Pack files (8k token budget)" },
+	{ on = [ "b", "C", "3" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack-budget.sh 16 %s", desc = "Pack files (16k token budget)" },
 
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
