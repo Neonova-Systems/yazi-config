@@ -27,6 +27,7 @@ prepend_keymap = [
 	{ on = [ "g", "i" ], run = "shell -- ~/.config/yazi/scripts/copy-file-to-clipboard.sh %h", desc = "Copy hovered file content to clipboard" },
 	{ on = [ "g", "I" ], run = "shell --block -- ~/.config/yazi/scripts/copy-images-collage-to-clipboard.sh %s", desc = "Copy selected images as one collage" },
 	{ on = [ "g", "M" ], run = "shell --block -- ~/.config/yazi/scripts/copy-images-collage-to-clipboard.sh --preserve %s", desc = "Copy selected images as preserve-aspect collage" },
+	{ on = [ "g", "z" ], run = "shell --block -- ~/.config/yazi/scripts/compress-video.sh %s", desc = "Compress selected videos with ffmpeg" },
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
