@@ -163,10 +163,6 @@ generate_once() {
   '
 
   echo ""
-  echo "Notes"
-  echo ""
-  echo "  - dd/dr are custom lf-style trash workflows from your keymap."
-  echo "  - g-bookmarks include both lf favorites and yazi defaults."
   } > "$tmp_text"
 
   magick \
