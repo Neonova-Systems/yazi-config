@@ -32,6 +32,10 @@ prepend_keymap = [
 	{ on = [ "g", "z", "3" ], run = "shell --block -- ~/.config/yazi/scripts/compress-video.sh 3 %s", desc = "Compress videos (strong)" },
 	{ on = [ "g", "z", "4" ], run = "shell --block -- ~/.config/yazi/scripts/compress-video.sh 4 %s", desc = "Compress videos (tiny 720p)" },
 	{ on = [ "g", "z", "5" ], run = "shell --block -- ~/.config/yazi/scripts/compress-video.sh 5 %s", desc = "Compress videos (HEVC)" },
+
+	# LLM workflow (copy for chat)
+	{ on = [ "b", "c" ], run = "shell --block -- ~/.config/yazi/scripts/chat-context-pack.sh %s", desc = "Pack selected files for chat context" },
+
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
 	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
