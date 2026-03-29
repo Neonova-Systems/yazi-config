@@ -53,7 +53,7 @@ prepend_keymap = [
 
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
-	{ on = "T", run = "shell --orphan -- dragon-drop %s", desc = "Drag selected files" },
+	{ on = "T", run = "shell --orphan -- ~/.config/yazi/scripts/drag-with-dragon.sh %s", desc = "Drag selected files/dirs" },
 
 	# Rename ergonomics (lf: A/C/I/i/a/B)
 	{ on = "A", run = "rename --cursor=end", desc = "Rename at end" },
