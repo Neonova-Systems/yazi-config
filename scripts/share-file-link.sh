@@ -12,6 +12,110 @@ if ! command -v curl >/dev/null 2>&1; then
   exit 1
 fi
 
+upload_0x0() {
+  local path=$1
+  local response http_code body
+  response=$(curl -sS -m 90 -w $'\n%{http_code}' -F "file=@${path}" https://0x0.st || true)
+  http_code=${response##*$'\n'}
+  body=${response%$'\n'*}
+  body=$(printf '%s' "$body" | tr -d '\r\n')
+
+  if [[ "$http_code" == "200" && "$body" == https://* ]]; then
+    printf '%s\n' "$body"
+    return 0
+  fi
+
+  return 1
+}
+
+upload_catbox() {
+  local path=$1
+  local body
+  body=$(curl -sS -m 90 -F "reqtype=fileupload" -F "fileToUpload=@${path}" https://catbox.moe/user/api.php || true)
+  body=$(printf '%s' "$body" | tr -d '\r\n')
+
+  if [[ "$body" == https://* ]]; then
+    printf '%s\n' "$body"
+    return 0
+  fi
+
+  return 1
+}
+
+upload_ix() {
+  local path=$1
+  local body
+  body=$(curl -sS -m 90 -F "f:1=@${path}" https://ix.io || true)
+  body=$(printf '%s' "$body" | tr -d '\r\n')
+
+  if [[ "$body" == https://* || "$body" == http://* ]]; then
+    printf '%s\n' "$body"
+    return 0
+  fi
+
+  return 1
+}
+
+upload_pasters() {
+  local path=$1
+  local body
+  body=$(curl -sS -m 90 --data-binary "@${path}" https://paste.rs/ || true)
+  body=$(printf '%s' "$body" | tr -d '\r\n')
+
+  if [[ "$body" == https://* || "$body" == http://* ]]; then
+    printf '%s\n' "$body"
+    return 0
+  fi
+
+  return 1
+}
+
+upload_tmpfiles() {
+  local path=$1
+  local body url
+  body=$(curl -sS -m 90 -F "file=@${path}" https://tmpfiles.org/api/v1/upload || true)
+  url=$(printf '%s' "$body" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)
+
+  if [[ "$url" == https://* ]]; then
+    printf '%s\n' "$url"
+    return 0
+  fi
+
+  return 1
+}
+
+upload_with_fallback() {
+  local path=$1
+  local link
+
+  if link=$(upload_0x0 "$path"); then
+    printf '%s\n' "$link"
+    return 0
+  fi
+
+  if link=$(upload_catbox "$path"); then
+    printf '%s\n' "$link"
+    return 0
+  fi
+
+  if link=$(upload_ix "$path"); then
+    printf '%s\n' "$link"
+    return 0
+  fi
+
+  if link=$(upload_pasters "$path"); then
+    printf '%s\n' "$link"
+    return 0
+  fi
+
+  if link=$(upload_tmpfiles "$path"); then
+    printf '%s\n' "$link"
+    return 0
+  fi
+
+  return 1
+}
+
 links=()
 skipped_count=0
 
@@ -22,11 +126,8 @@ for path in "$@"; do
     continue
   fi
 
-  link=$(curl -fsS -F "file=@${path}" https://0x0.st || true)
-  link=$(printf '%s' "$link" | tr -d '\r\n')
-
-  if [[ -z "$link" ]]; then
-    echo "Upload failed: $path" >&2
+  if ! link=$(upload_with_fallback "$path"); then
+    echo "Upload failed on all providers: $path" >&2
     skipped_count=$((skipped_count + 1))
     continue
   fi
