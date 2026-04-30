@@ -51,6 +51,8 @@ prepend_keymap = [
 	{ on = [ "b", "S", "1" ], run = "shell --block -- ~/.config/yazi/scripts/split-pdf.sh %h 2", desc = "Split PDF in half (2 chunks)" },
 	{ on = [ "b", "S", "2" ], run = "shell --block -- ~/.config/yazi/scripts/split-pdf.sh %h 3", desc = "Split PDF into 3 chunks" },
 	{ on = [ "b", "S", "3" ], run = "shell --block -- ~/.config/yazi/scripts/split-pdf.sh %h 4", desc = "Split PDF into 4 chunks" },
+	{ on = [ "b", "J" ], run = "shell --block -- ~/.config/yazi/scripts/join-pdf.sh %s", desc = "Join selected PDFs into one file" },
+	{ on = [ "b", "r" ], run = "shell --block -- ~/.config/yazi/scripts/rotate-pdf-clockwise.sh %h", desc = "Rotate hovered PDF clockwise" },
 
 	{ on = "Y", run = "copy filename", desc = "Copy filename" },
 	{ on = "<C-f>", run = "plugin fzf", desc = "Jump with fzf" },
